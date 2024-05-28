@@ -1,7 +1,8 @@
 from typing import Any
+
 from django_filters import ChoiceFilter, FilterSet
 
-from products.models import ProductCategory, Product
+from products.models import Product, ProductCategory
 
 
 class ProductFilter(FilterSet):
@@ -15,4 +16,6 @@ class ProductFilter(FilterSet):
 
     class Meta:
         model = Product
-        fields = ["category", ]
+        fields = [
+            "category",
+        ]

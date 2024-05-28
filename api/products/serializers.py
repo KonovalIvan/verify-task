@@ -18,7 +18,9 @@ class ProductsViewSerializer(serializers.ModelSerializer):
 class AllProductsViewSerializer(ProductsViewSerializer):
     class Meta:
         model = Product
-        fields = ["id", ] + ProductsViewSerializer.Meta.fields
+        fields = [
+            "id",
+        ] + ProductsViewSerializer.Meta.fields
 
 
 class ProductsQuerySerializer(serializers.Serializer):
