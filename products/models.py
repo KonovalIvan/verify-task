@@ -13,7 +13,7 @@ class BaseModel(models.Model):
 
 
 class Product(BaseModel):
-    name = models.CharField(max_length=128, null=False, blank=False, help_text='This name user see on his receipt')
+    name = models.CharField(max_length=128, null=False, blank=False, help_text="This name user see on his receipt")
     description = models.TextField(max_length=2000)
     price = models.DecimalField(max_digits=12, decimal_places=2)
     amount = models.IntegerField(default=0)
