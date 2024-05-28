@@ -1,14 +1,13 @@
 from typing import Any
 
-from django.http import JsonResponse
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.products.serializers import ProductsViewSerializer, ProductsQuerySerializer
+from api.products.serializers import ProductsQuerySerializer, ProductsViewSerializer
 from products.models import Product
 from products.services import DefaultProductsServices
 
@@ -34,9 +33,8 @@ class ProductsView(APIView):
     @extend_schema(
         responses={status.HTTP_200_OK: serializer_class},
         parameters=[
-            OpenApiParameter('product_id', OpenApiTypes.UUID,
-                             description='Find product by id'),
-        ]
+            OpenApiParameter("product_id", OpenApiTypes.UUID, description="Find product by id"),
+        ],
     )
     def put(self, request: Request) -> Response:
         """Update existing product"""
@@ -47,6 +45,8 @@ class ProductsView(APIView):
         query_params = ProductsQuerySerializer(data=request.query_params)
         query_params.is_valid(raise_exception=True)
 
-        if result := DefaultProductsServices.update_existing_product(serializer.validated_data, query_params.validated_data):
+        if result := DefaultProductsServices.update_existing_product(
+            serializer.validated_data, query_params.validated_data
+        ):
             return Response(self.serializer_class(result).data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND, exception=Product.DoesNotExist)
