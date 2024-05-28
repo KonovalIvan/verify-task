@@ -19,17 +19,33 @@ class ProductCategory(models.TextChoices):
     the code. Also can instead of creating a model create an enum class with a selection, it is not difficult, and it is
     convenient. This way is simplest and corresponds to the requirements that I can not specify
     """
+
     # TODO: Add gettext translating: usage eg. _("food")
-    NO_CAT = '-', 'No category',
-    FOOD = 'F', 'Food',
-    CONSUMABLES = 'C', 'Consumables',
-    MANUFACTURED = 'M', 'Manufactured',
-    SERVICES = 'S', 'Services',
+    NO_CAT = (
+        "-",
+        "No category",
+    )
+    FOOD = (
+        "F",
+        "Food",
+    )
+    CONSUMABLES = (
+        "C",
+        "Consumables",
+    )
+    MANUFACTURED = (
+        "M",
+        "Manufactured",
+    )
+    SERVICES = (
+        "S",
+        "Services",
+    )
 
 
 class Product(BaseModel):
     name = models.CharField(max_length=128, null=False, blank=False, help_text="This name user see on his receipt")
-    description = models.TextField(max_length=2000, blank=True, default='')
+    description = models.TextField(max_length=2000, blank=True, default="")
     price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
     amount = models.IntegerField(default=0)
     category = models.CharField(
