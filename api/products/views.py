@@ -8,16 +8,39 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.products.serializers import ProductsQuerySerializer, ProductsViewSerializer
-from products.models import Product
+from api.products.serializers import (
+    AllProductsViewSerializer,
+    ProductsListFiltersSerializer,
+    ProductsQuerySerializer,
+    ProductsViewSerializer,
+)
+from products.models import Product, ProductCategory
+from products.selectors import ProductSelector
 from products.services import DefaultProductsServices
 
 
 class ProductsView(APIView):
     serializer_class = ProductsViewSerializer
 
+    @extend_schema(
+        responses={status.HTTP_200_OK: AllProductsViewSerializer(many=True)},
+        parameters=[
+            OpenApiParameter(
+                name="category",
+                type=OpenApiTypes.STR,
+                enum=ProductCategory,
+                required=False,
+            ),
+        ],
+    )
     def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
-        pass
+        serializer_class = AllProductsViewSerializer
+
+        query = ProductsListFiltersSerializer(data=request.query_params)
+        query.is_valid(raise_exception=True)
+        result = ProductSelector.filter_by_category(query.validated_data)
+
+        return Response(serializer_class(result, many=True).data, status=status.HTTP_200_OK)
 
     @extend_schema(
         responses={status.HTTP_201_CREATED: serializer_class},
@@ -55,7 +78,9 @@ class ProductsView(APIView):
         )
 
 
-class DeleteProductsView(APIView):
+class SingleProductsView(APIView):
+    serializer_class = ProductsViewSerializer
+
     @extend_schema(
         responses={status.HTTP_204_NO_CONTENT},
     )
@@ -67,4 +92,15 @@ class DeleteProductsView(APIView):
             Response(status=status.HTTP_204_NO_CONTENT)
             if success
             else Response({"error_msg": "Failed to find a product."}, status=status.HTTP_404_NOT_FOUND)
+        )
+
+    @extend_schema(
+        responses={status.HTTP_200_OK: serializer_class},
+    )
+    def get(self, request: Request, product_id: UUID, *args: Any, **kwargs: Any) -> Response:
+        """Get single product"""
+        if product := ProductSelector.get_by_uuid(uuid=product_id):
+            return Response(self.serializer_class(product).data, status=status.HTTP_200_OK)
+        return Response(
+            {"error_msg": "Failed to find a product."}, status=status.HTTP_404_NOT_FOUND, exception=Product.DoesNotExist
         )
