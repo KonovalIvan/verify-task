@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 
 from products.models import Product
 from products.selectors import ProductSelector
@@ -19,3 +20,10 @@ class DefaultProductsServices:
             return products.first()
         else:
             return None
+
+    @staticmethod
+    def delete_product_by_id(product_id: UUID) -> bool:
+        if product := ProductSelector.get_by_uuid(product_id):
+            product.delete()
+            return True
+        return False
