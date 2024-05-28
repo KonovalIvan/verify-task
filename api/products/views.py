@@ -1,4 +1,5 @@
 from typing import Any
+from uuid import UUID
 
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
@@ -6,7 +7,6 @@ from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from uuid import UUID
 
 from api.products.serializers import ProductsQuerySerializer, ProductsViewSerializer
 from products.models import Product
@@ -50,9 +50,9 @@ class ProductsView(APIView):
             serializer.validated_data, query_params.validated_data
         ):
             return Response(self.serializer_class(result).data, status=status.HTTP_200_OK)
-        return Response({"error_msg": "Failed to find a product."},
-                        status=status.HTTP_404_NOT_FOUND,
-                        exception=Product.DoesNotExist)
+        return Response(
+            {"error_msg": "Failed to find a product."}, status=status.HTTP_404_NOT_FOUND, exception=Product.DoesNotExist
+        )
 
 
 class DeleteProductsView(APIView):
