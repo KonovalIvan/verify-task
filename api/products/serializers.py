@@ -11,4 +11,9 @@ class ProductsViewSerializer(serializers.ModelSerializer):
             "description",
             "price",
             "amount",
+            "category",
         ]
+
+
+class ProductsQuerySerializer(serializers.Serializer):
+    product_id = serializers.UUIDField(required=False)
